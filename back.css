@@ -1,0 +1,41 @@
+.back-btn{
+  position:fixed;
+  top:70px;   /* 👈 neeche shift */
+  left:15px;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+
+  /* 🔥 TRANSPARENT GLASS EFFECT */
+  background:rgba(255,255,255,0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border:1px solid rgba(255,255,255,0.4);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  box-shadow:0 4px 12px rgba(0,0,0,0.10);
+  cursor:pointer;
+  z-index:999;
+  transition:0.3s;
+}
+
+/* ICON */
+.back-btn i{
+  font-size:18px;
+  color:#ff2b2b;
+}
+
+/* HOVER EFFECT */
+.back-btn:hover{
+  transform:scale(1.1);
+  background:#ff2b2b;
+  border-color:#ff2b2b;
+}
+
+.back-btn:hover i{
+  color:#fff;
+}

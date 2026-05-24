@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generate Invoice - City Choice Bakers</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="back.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins', sans-serif;
+}
+
+body{
+background:#f4f5f7;
+padding:15px;
+color:#333;
+}
+
+.main-container {
+display: grid;
+grid-template-columns: 1fr;
+gap: 20px;
+max-width: 1100px;
+margin: 0 auto;
+}
+
+@media(min-width: 850px) {
+    .main-container {
+        grid-template-columns: 380px 1fr;
+    }
+}
+
+/* INPUT FORM PANEL */
+.input-panel {
+background: #fff;
+padding: 20px;
+border-radius: 16px;
+box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+height: fit-content;
+}
+
+.input-panel h3 {
+font-size: 16px;
+margin-bottom: 15px;
+color: #111;
+border-bottom: 2px solid #ff2b2b;
+padding-bottom: 5px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.form-group {
+margin-bottom: 12px;
+}
+
+.form-group label {
+display: block;
+font-size: 11px;
+font-weight: 600;
+color: #666;
+margin-bottom: 4px;
+text-transform: uppercase;
+}
+
+.form-group input, .form-group select {
+width: 100%;
+padding: 10px;
+border: 1px solid #ddd;
+border-radius: 8px;
+font-size: 13px;
+outline: none;
+transition: 0.2s;
+}
+
+.form-group input:focus {
+border-color: #ff2b2b;
+}
+
+.items-builder {
+background: #f9f9f9;
+padding: 10px;
+border-radius: 10px;
+margin-bottom: 15px;
+border: 1px dashed #ccc;
+}
+
+.btn-add-item {
+background: #333;
+color: #fff;
+border: none;
+width: 100%;
+padding: 8px;
+border-radius: 6px;
+font-size: 12px;
+font-weight: 600;
+cursor: pointer;
+margin-top: 5px;
+}
+
+.action-block {
+display: flex;
+flex-direction: column;
+gap: 10px;
+margin-top: 15px;
+}
+
+.action-btn {
+width: 100%;
+padding: 12px;
+border: none;
+border-radius: 10px;
+font-size: 14px;
+font-weight: 600;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+color: #fff;
+}
+
+.btn-download { background: #ff2b2b; }
+.btn-whatsapp { background: #25d366; }
+
+/* ================= INVOICE LIVE CANVAS DESIGN (SAME AS IMAGE) ================= */
+.canvas-wrapper {
+background: #fff;
+padding: 40px;
+border-radius: 8px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+min-height: 842px; /* A4 Ratio Look */
+position: relative;
+}
+
+.invoice-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+border-bottom: 3px solid #8B0000;
+padding-bottom: 15px;
+margin-bottom: 25px;
+}
+
+.brand-side {
+display: flex;
+align-items: center;
+gap: 15px;
+}
+
+.brand-side img {
+width: 75px;
+height: 75px;
+border-radius: 50%;
+object-fit: cover;
+}
+
+.brand-info h1 {
+font-size: 28px;
+font-weight: 700;
+color: #8B0000;
+letter-spacing: 0.5px;
+}
+
+.brand-info p {
+font-size: 12px;
+color: #555;
+line-height: 1.4;
+}
+
+.fssai-badge {
+font-size: 10px;
+background: #f1f8e9;
+color: #33691e;
+padding: 2px 6px;
+border-radius: 4px;
+border: 1px solid #c5e1a5;
+font-weight: 600;
+display: inline-flex;
+align-items: center;
+gap: 4px;
+margin-top: 4px;
+}
+
+/* BILL TO & META BLOCK */
+.bill-meta-container {
+display: flex;
+justify-content: space-between;
+margin-bottom: 30px;
+font-size: 13px;
+line-height: 1.5;
+}
+
+.bill-to h4 {
+font-size: 14px;
+color: #111;
+margin-bottom: 5px;
+letter-spacing: 0.5px;
+}
+
+.meta-details {
+text-align: right;
+}
+
+/* TABLE STRUCTURE */
+.invoice-table {
+width: 100%;
+border-collapse: collapse;
+margin-bottom: 20px;
+font-size: 12px;
+}
+
+.invoice-table th {
+background: #8B0000;
+color: #fff;
+padding: 8px 12px;
+font-weight: 500;
+text-align: left;
+}
+
+.invoice-table td {
+padding: 10px 12px;
+border-bottom: 1px solid #ddd;
+color: #333;
+}
+
+.invoice-table tr:nth-child(even) td {
+background: #f9f9f9;
+}
+
+/* SUMMARY WRAPPER */
+.summary-wrapper {
+margin-left: auto;
+width: 280px;
+font-size: 13px;
+margin-top: 20px;
+}
+
+.summary-line {
+display: flex;
+justify-content: space-between;
+padding: 6px 0;
+color: #444;
+}
+
+.summary-line.paid-line {
+color: #2e7d32;
+font-weight: 600;
+}
+
+.balance-due-box {
+background: #8B0000;
+color: #fff;
+padding: 10px 15px;
+display: flex;
+justify-content: space-between;
+font-weight: 600;
+font-size: 14px;
+margin-top: 10px;
+}
+
+.footer-greeting {
+position: absolute;
+bottom: 40px;
+left: 0;
+width: 100%;
+text-align: center;
+font-size: 12px;
+font-style: italic;
+color: #999;
+}
+
+.delete-row-btn {
+color: #ff2b2b;
+cursor: pointer;
+border: none;
+background: none;
+font-size: 12px;
+}
+</style>
+</head>
+<body>
+
+<div class="main-container">
+    
+    <div class="input-panel">
+        <h3><i class="fa-solid fa-file-pen"></i> Invoice Details</h3>
+        
+        <div class="form-group">
+            <label>Select Branch Logo</label>
+            <select id="inputLogo" onchange="updateLogo(this.value)">
+                <option value="logo.png">Magam Branch (logo.png)</option>
+                <option value="logo2.png">Kunzer Branch (logo2.png)</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Customer Name</label>
+            <input type="text" id="inputName" placeholder="Enter name" oninput="syncText('previewName', this.value, 'Walk-in Customer')">
+        </div>
+        <div class="form-group">
+            <label>Contact Number</label>
+            <input type="tel" id="inputPhone" placeholder="Enter mobile" oninput="syncText('previewPhone', this.value, 'N/A')">
+        </div>
+        <div class="form-group">
+            <label>Address / Markit</label>
+            <input type="text" id="inputAddress" placeholder="Enter address" oninput="syncText('previewAddress', this.value, 'N/A')">
+        </div>
+        <div class="form-group">
+            <label>Invoice Number</label>
+            <input type="text" id="inputInvNo" value="NEW" oninput="syncText('previewInvNo', this.value, 'NEW')">
+        </div>
+
+        <div class="items-builder">
+            <label style="font-size: 11px; font-weight:700; color:#555; display:block; margin-bottom:5px;">ADD PRODUCT ITEM</label>
+            <div class="form-group">
+                <input type="text" id="itemDesc" placeholder="Item Description (e.g., Eid Roti)">
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <div class="form-group" style="flex: 1;">
+                    <input type="number" id="itemQty" placeholder="Qty" value="1">
+                </div>
+                <div class="form-group" style="flex: 2;">
+                    <input type="number" id="itemPrice" placeholder="Price (Rs.)">
+                </div>
+            </div>
+            <button class="btn-add-item" onclick="addItemRow()"><i class="fa-solid fa-plus"></i> Push to Table</button>
+        </div>
+
+        <div class="form-group">
+            <label>Paid Amount (Rs.)</label>
+            <input type="number" id="inputPaid" value="0" oninput="calculateCalculations()">
+        </div>
+
+        <div class="action-block">
+            <button class="action-btn btn-download" onclick="downloadInvoicePDF()">
+                <i class="fa-solid fa-file-pdf"></i> Download Invoice
+            </button>
+            <button class="action-btn btn-whatsapp" onclick="shareOnWhatsApp()">
+                <i class="fa-brands fa-whatsapp"></i> Share on WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <div class="canvas-wrapper" id="invoiceCanvas">
+        
+        <div class="invoice-header">
+            <div class="brand-side">
+                <img id="previewLogo" src="logo.png" alt="City Choice Logo">
+                <div class="brand-info">
+                    <h1>CITY CHOICE BAKERS</h1>
+                    <p>Gulmarg Road Magam<br>Mob: 7006592704</p>
+                    <div class="fssai-badge">
+                        <i class="fa-solid fa-shield-halved"></i> fssai Lic No: 11023070000010
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bill-meta-container">
+            <div class="bill-to">
+                <h4>BILL TO:</h4>
+                <p id="previewName" style="text-transform: uppercase; font-weight:600;">WALK-IN CUSTOMER</p>
+                <p>Contact: <span id="previewPhone">N/A</span></p>
+                <p id="previewAddress">N/A</p>
+            </div>
+            <div class="meta-details">
+                <p><strong>Date:</strong> <span id="previewDate">2026-03-16</span></p>
+                <p><strong>Inv #:</strong> <span id="previewInvNo" style="font-weight: 600;">NEW</span></p>
+            </div>
+        </div>
+
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Date</th>
+                    <th style="width: 45%;">Item Description</th>
+                    <th style="width: 10%;">Qty</th>
+                    <th style="width: 15%;">Unit Price</th>
+                    <th style="width: 15%;">Total</th>
+                    <th class="hide-on-pdf" style="width: 5%;"></th>
+                </tr>
+            </thead>
+            <tbody id="invoiceItemsTable">
+                </tbody>
+        </table>
+
+        <div class="summary-wrapper">
+            <div class="summary-line">
+                <span>Subtotal:</span>
+                <span>Rs. <span id="previewSubtotal">0.00</span></span>
+            </div>
+            <div class="summary-line paid-line">
+                <span>Paid Amount:</span>
+                <span>Rs. <span id="previewPaid">0.00</span></span>
+            </div>
+            <div class="balance-due-box">
+                <span>Balance Due:</span>
+                <span>Rs. <span id="previewBalance">0.00</span></span>
+            </div>
+        </div>
+
+        <div class="footer-greeting">Thank you for your business!</div>
+    </div>
+
+</div>
+
+<script>
+// Global cache storage array for table structures
+let invoiceItems = [];
+let currentCalculatedDate = "";
+
+// 1. AUTO RUN RUNTIME DATE INITIALIZATION PIPELINE
+function setupCurrentSystemDate() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    let mm = today.getMonth() + 1; 
+    let dd = today.getDate();
+
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+
+    currentCalculatedDate = yyyy + '-' + mm + '-' + dd;
+    document.getElementById("previewDate").innerText = currentCalculatedDate;
+}
+
+// 2. RUNTIME UI TEXT FIELDS SYNC ENGINE
+function syncText(elementId, value, fallback) {
+    document.getElementById(elementId).innerText = value.trim() !== "" ? value : fallback;
+}
+
+function updateLogo(val) {
+    document.getElementById("previewLogo").src = val;
+}
+
+// 3. TABLE ROW ADDITION SYSTEM
+function addItemRow() {
+    let desc = document.getElementById("itemDesc").value.trim();
+    let qty = parseInt(document.getElementById("itemQty").value) || 0;
+    let price = parseFloat(document.getElementById("itemPrice").value) || 0;
+
+    if(desc === "" || qty <= 0 || price <= 0) {
+        return alert("Please enter valid item description, quantity, and unit price.");
+    }
+
+    let total = qty * price;
+    
+    // Add inside matrix arrays
+    invoiceItems.push({
+        id: Date.now(),
+        date: currentCalculatedDate,
+        description: desc,
+        qty: qty,
+        price: price,
+        total: total
+    });
+
+    // Clear input fields safely
+    document.getElementById("itemDesc").value = "";
+    document.getElementById("itemQty").value = "1";
+    document.getElementById("itemPrice").value = "";
+
+    renderTableRows();
+}
+
+// Remove single specific selected row from list cache mapping
+function removeRowItem(id) {
+    invoiceItems = invoiceItems.filter(item => item.id !== id);
+    renderTableRows();
+}
+
+// 4. DATA RENDERING AND CALCULATIONS COMPILER
+function renderTableRows() {
+    let tbody = document.getElementById("invoiceItemsTable");
+    tbody.innerHTML = "";
+
+    invoiceItems.forEach(item => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${item.date}</td>
+                <td><b>${item.description}</b></td>
+                <td>${item.qty}</td>
+                <td>Rs. ${item.price.toFixed(2)}</td>
+                <td>Rs. ${item.total.toFixed(2)}</td>
+                <td class="hide-on-pdf" style="text-align:center;">
+                    <button class="delete-row-btn" onclick="removeRowItem(${item.id})"><i class="fa-solid fa-trash-can"></i></button>
+                </td>
+            </tr>`;
+    });
+
+    calculateCalculations();
+}
+
+function calculateCalculations() {
+    let subtotal = 0;
+    invoiceItems.forEach(item => subtotal += item.total);
+
+    let paidInput = parseFloat(document.getElementById("inputPaid").value) || 0;
+    let balance = subtotal - paidInput;
+
+    // Direct interface assignment mapping injection
+    document.getElementById("previewSubtotal").innerText = subtotal.toFixed(2);
+    document.getElementById("previewPaid").innerText = paidInput.toFixed(2);
+    document.getElementById("previewBalance").innerText = balance.toFixed(2);
+}
+
+// 5. PRINT HIGH RESOLUTION PDF FILE SAVER
+function downloadInvoicePDF() {
+    if(invoiceItems.length === 0) return alert("Cannot compile empty invoice canvas sheets.");
+
+    let canvasElement = document.getElementById("invoiceCanvas");
+    let customerName = document.getElementById("inputName").value.trim() || "Customer";
+
+    // Hide explicit interactive elements during active canvas scanning
+    let actionColumns = document.querySelectorAll('.hide-on-pdf');
+    actionColumns.forEach(el => el.style.visibility = 'hidden');
+
+    let renderSettings = {
+        margin:       12,
+        filename:     `Invoice_${customerName.replace(/\s+/g, '_')}_CityChoice.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2.5, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(renderSettings).from(canvasElement).save().then(() => {
+        // Restore action buttons back safely on runtime complete
+        actionColumns.forEach(el => el.style.visibility = 'visible');
+    });
+}
+
+// 6. WHATSAPP ENGINE INSTANT API LINK ROUTER
+function shareOnWhatsApp() {
+    let phoneNum = document.getElementById("inputPhone").value.trim();
+    let name = document.getElementById("inputName").value.trim() || "Valued Customer";
+    let subtotal = document.getElementById("previewSubtotal").innerText;
+    let paid = document.getElementById("previewPaid").innerText;
+    let balance = document.getElementById("previewBalance").innerText;
+
+    if(invoiceItems.length === 0) return alert("Add rows before attempting sharing log data outputs.");
+
+    // String builder message construction template markup
+    let textMessage = `*CITY CHOICE BAKERS* %0A` +
+                      `*Invoice Summary Notification* %0A%0A` +
+                      `Dear *${name}*, thank you for business.%0A%0A` +
+                      `*Total Bill:* Rs. ${subtotal}%0A` +
+                      `*Paid Amount:* Rs. ${paid}%0A` +
+                      `*Balance Due:* Rs. ${balance}%0A%0A` +
+                      `Your document layout is updated inside cloud. Thank you!`;
+
+    let apiBaseUrl = `https://api.whatsapp.com/send?text=${textMessage}`;
+    
+    if(phoneNum !== "") {
+        // Prefix Indian International Country Routing code if explicitly missing standard sets
+        if(!phoneNum.startsWith("91") && phoneNum.length === 10) phoneNum = "91" + phoneNum;
+        apiBaseUrl = `https://api.whatsapp.com/send?phone=${phoneNum}&text=${textMessage}`;
+    }
+
+    window.open(apiBaseUrl, '_blank');
+}
+
+// Initialization hooks setup bindings execution trigger point
+window.onload = function() {
+    setupCurrentSystemDate();
+};
+</script>
+<script src="back.js"></script>
+</body>
+</html>

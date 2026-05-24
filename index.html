@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Salesman Login - City Choice Bakers</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+
+background:
+linear-gradient(135deg,#120000,#3d0000,#7a0000);
+}
+
+.login-box{
+width:100%;
+max-width:420px;
+
+background:#fff;
+
+border-radius:25px;
+
+padding:30px 25px;
+
+box-shadow:
+0 10px 30px rgba(0,0,0,.2);
+}
+
+.logo{
+text-align:center;
+margin-bottom:25px;
+}
+
+.logo img{
+width:100px;
+height:100px;
+border-radius:50%;
+border:4px solid #ff2b2b;
+padding:4px;
+background:#fff;
+}
+
+.logo h2{
+margin-top:12px;
+font-size:24px;
+color:#111;
+}
+
+.logo p{
+color:#666;
+font-size:14px;
+margin-top:5px;
+}
+
+.input-box{
+margin-bottom:15px;
+}
+
+.input-box label{
+display:block;
+margin-bottom:8px;
+font-size:14px;
+font-weight:600;
+color:#333;
+}
+
+.input-box input{
+width:100%;
+padding:14px;
+border:1px solid #ddd;
+border-radius:12px;
+outline:none;
+font-size:15px;
+}
+
+.input-box input:focus{
+border-color:#ff2b2b;
+}
+
+.login-btn{
+width:100%;
+padding:15px;
+
+border:none;
+
+border-radius:14px;
+
+background:#ff2b2b;
+
+color:#fff;
+
+font-size:16px;
+font-weight:600;
+
+cursor:pointer;
+
+margin-top:10px;
+}
+
+.login-btn:hover{
+opacity:.9;
+}
+
+.alert{
+margin-top:15px;
+padding:12px;
+border-radius:12px;
+display:none;
+font-size:14px;
+text-align:center;
+}
+
+.success{
+background:#dcfce7;
+color:#166534;
+}
+
+.error{
+background:#fee2e2;
+color:#991b1b;
+}
+
+</style>
+</head>
+<body>
+
+<div class="login-box">
+
+<div class="logo">
+
+<img src="logo.png">
+
+<h2>City Choice Bakers</h2>
+
+<p>
+<i class="fa-solid fa-user-shield"></i>
+ Salesman Authentication
+</p>
+
+</div>
+
+<div class="input-box">
+<label>Username</label>
+<input type="text" id="username" placeholder="Enter Username">
+</div>
+
+<div class="input-box">
+<label>Email</label>
+<input type="email" id="email" placeholder="Enter Email">
+</div>
+
+<div class="input-box">
+<label>Password</label>
+<input type="password" id="password" placeholder="Enter Password">
+</div>
+
+<button class="login-btn" onclick="loginSalesman()">
+<i class="fa-solid fa-right-to-bracket"></i>
+ Login
+</button>
+
+<div id="alertBox" class="alert"></div>
+
+</div>
+
+<script>
+
+async function loginSalesman(){
+
+const username =
+document.getElementById("username").value.trim();
+
+const email =
+document.getElementById("email").value.trim();
+
+const password =
+document.getElementById("password").value.trim();
+
+const alertBox =
+document.getElementById("alertBox");
+
+if(!username || !email || !password){
+
+alertBox.style.display="block";
+alertBox.className="alert error";
+alertBox.innerHTML="Please fill all fields";
+
+return;
+}
+
+const { data, error } = await supabaseClient
+.from("salesmen")
+.select("*")
+.eq("username",username)
+.eq("email",email)
+.eq("password",password)
+.single();
+
+if(error || !data){
+
+alertBox.style.display="block";
+alertBox.className="alert error";
+alertBox.innerHTML="Invalid Login Credentials";
+
+return;
+}
+
+localStorage.setItem(
+"salesman",
+JSON.stringify(data)
+);
+
+alertBox.style.display="block";
+alertBox.className="alert success";
+alertBox.innerHTML="Login Successful";
+
+setTimeout(()=>{
+window.location.href="salesman.html";
+},1000);
+
+}
+
+</script>
+
+</body>
+</html>

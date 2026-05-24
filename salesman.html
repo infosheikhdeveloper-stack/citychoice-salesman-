@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff2b2b">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salesman Dashboard - City Choice Bakers</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="back.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#f6f6f6;
+padding-bottom:40px;
+}
+
+/* HEADER SECTION */
+.header{
+background:linear-gradient(135deg,#ff2b2b,#111);
+padding:25px 20px;
+color:#fff;
+border-radius:0 0 25px 25px;
+box-shadow:0 8px 20px rgba(0,0,0,.15);
+text-align:center;
+}
+
+.logo-box{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:12px;
+margin-bottom:15px;
+}
+
+.logo-box img{
+width:65px;
+height:65px;
+border-radius:50%;
+background:#fff;
+padding:3px;
+border: 2px solid #ff2b2b;
+}
+
+.logo-box h2{
+font-size:22px;
+letter-spacing: 0.5px;
+}
+
+.logo-box p{
+font-size:12px;
+opacity:.8;
+}
+
+/* PROFILE BADGE BOX */
+.salesman-badge {
+background: rgba(255, 255, 255, 0.15);
+border-radius: 15px;
+padding: 12px;
+display: flex;
+align-items: center;
+gap: 15px;
+text-align: left;
+backdrop-filter: blur(5px);
+max-width: 400px;
+margin: 0 auto;
+border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.salesman-badge img.user-pic {
+width: 50px;
+height: 50px;
+border-radius: 50%;
+object-fit: cover;
+background: #fff;
+border: 2px solid #ff2b2b;
+}
+
+.salesman-info h4 {
+font-size: 15px;
+font-weight: 600;
+color: #fff;
+}
+
+.salesman-info p {
+font-size: 11px;
+opacity: 0.9;
+color: #eee;
+margin-top: 2px;
+}
+
+.salesman-info p i {
+margin-right: 4px;
+color: #ff2b2b;
+}
+
+/* METRICS / STATS GRID */
+.stats-grid{
+display:grid;
+grid-template-columns:1fr;
+gap:15px;
+padding:20px;
+max-width: 500px;
+margin: 0 auto;
+}
+
+@media(min-width: 400px) {
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .full-width {
+        grid-column: span 2;
+    }
+}
+
+.stat-card{
+background:#fff;
+padding:20px;
+border-radius:20px;
+text-align:center;
+box-shadow:0 5px 15px rgba(0,0,0,.05);
+border-bottom: 4px solid #ddd;
+transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+}
+
+.card-total { border-color: #ff2b2b; }
+.card-cash { border-color: #16a34a; }
+.card-online { border-color: #0284c7; }
+
+.stat-card i{
+font-size:26px;
+margin-bottom:10px;
+display: inline-block;
+}
+
+.card-total i { color: #ff2b2b; }
+.card-cash i { color: #16a34a; }
+.card-online i { color: #0284c7; }
+
+.stat-card h3{
+font-size:24px;
+color:#111;
+margin-top:5px;
+}
+
+.stat-card p{
+font-size:13px;
+color:#666;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+
+/* NAVIGATION BUTTONS */
+.menu-box{
+padding:0 20px;
+display:flex;
+flex-direction:column;
+gap:12px;
+max-width: 500px;
+margin: 10px auto 0 auto;
+}
+
+.menu-btn{
+background:#fff;
+padding:16px;
+border-radius:16px;
+text-decoration:none;
+color:#111;
+display:flex;
+align-items:center;
+justify-content: space-between;
+font-weight:600;
+box-shadow:0 5px 15px rgba(0,0,0,.04);
+transition: 0.2s;
+}
+
+.menu-btn:hover {
+    background: #fdfdfd;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+}
+
+.menu-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.menu-btn i.icon-main{
+width:42px;
+height:42px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size: 18px;
+}
+
+.btn-add i.icon-main { background:#ffebeb; color:#ff2b2b; }
+.btn-invoice i.icon-main { background:#f3e8ff; color:#7e22ce; }
+.btn-history i.icon-main { background:#e0f2fe; color:#0284c7; }
+
+.menu-btn i.arrow {
+    color: #ccc;
+    font-size: 14px;
+}
+
+/* LOGOUT BUTTON */
+.logout-btn{
+margin: 25px auto 0 auto;
+width: calc(100% - 40px);
+max-width: 500px;
+display: block;
+padding: 15px;
+border: none;
+border-radius: 15px;
+background: #dc2626;
+color: #fff;
+font-size: 15px;
+font-weight: 600;
+cursor: pointer;
+box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+text-align: center;
+}
+
+.logout-btn:hover{
+opacity:.9;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo-box">
+        <img src="logo.png" alt="City Choice Logo">
+        <div>
+            <h2>City Choice Bakers</h2>
+            <p>Salesman Dashboard</p>
+        </div>
+    </div>
+
+    <div class="salesman-badge">
+        <img id="salesmanPic" class="user-pic" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Salesman Pic">
+        <div class="salesman-info">
+            <h4 id="salesmanName">Loading...</h4>
+            <p id="salesmanEmail"><i class="fa-solid fa-envelope"></i> Loading...</p>
+            <p id="salesmanPhone"><i class="fa-solid fa-phone"></i> Loading...</p>
+        </div>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card card-total full-width">
+        <i class="fa-solid fa-chart-line"></i>
+        <h3 id="totalSale">₹0</h3>
+        <p>Your Total Sale</p>
+    </div>
+
+    <div class="stat-card card-cash">
+        <i class="fa-solid fa-money-bill-wave"></i>
+        <h3 id="cashSale">₹0</h3>
+        <p>Total Cash</p>
+    </div>
+
+    <div class="stat-card card-online">
+        <i class="fa-solid fa-globe"></i>
+        <h3 id="onlineSale">₹0</h3>
+        <p>Total Online / Mpay</p>
+    </div>
+</div>
+
+<div class="menu-box">
+    <a href="addsale.html" class="menu-btn btn-add">
+        <div class="menu-left">
+            <i class="fa-solid fa-plus icon-main"></i>
+            <span>Add New Sale</span>
+        </div>
+        <i class="fa-solid fa-chevron-right arrow"></i>
+    </a>
+
+    <a href="invoice.html" class="menu-btn btn-invoice">
+        <div class="menu-left">
+            <i class="fa-solid fa-file-invoice-dollar icon-main"></i>
+            <span>Generate Invoice</span>
+        </div>
+        <i class="fa-solid fa-chevron-right arrow"></i>
+    </a>
+
+    <a href="history.html" class="menu-btn btn-history">
+        <div class="menu-left">
+            <i class="fa-solid fa-clock-rotate-left icon-main"></i>
+            <span>View Sales History</span>
+        </div>
+        <i class="fa-solid fa-chevron-right arrow"></i>
+    </a>
+</div>
+
+<button id="installBtn" class="logout-btn" style="display:none;background:#16a34a;">
+    <i class="fa-solid fa-download"></i> Install App
+</button>
+
+<button class="logout-btn" onclick="logout()">
+    <i class="fa-solid fa-right-from-bracket"></i> Logout From Session
+</button>
+
+<script>
+// --- DIRECT INLINE SUPABASE CREDENTIALS SETUP ---
+const SUPABASE_URL = "https://ftuchilcswtnnldrugir.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0dWNoaWxjc3d0bm5sZHJ1Z2lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNjAyNDQsImV4cCI6MjA5NDczNjI0NH0.88SWE5lvsJD0Fw8x7h4pgAmq1WFRN1qMvmXHCXeDqsU";           
+
+let db;
+
+// 1. DATABASE INITIALIZATION
+try {
+    if (typeof supabase !== 'undefined') {
+        db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else {
+        console.error("Supabase CDN package missing.");
+    }
+} catch(err) {
+    console.error("Database connection failed:", err.message);
+}
+
+// 2. SAFE SESSION FETCH & PERSISTENCE LOCK 
+const salesman = JSON.parse(localStorage.getItem("salesman"));
+
+if(!salesman){
+    window.location.href = "salesmanlogin.html";
+}
+
+// User credentials variables setup
+const currentSalesmanName = salesman.username || salesman.name || "Salesman Profile";
+const currentSalesmanEmail = salesman.email || "";
+const currentSalesmanPhone = salesman.phone || "No Phone Registered";
+const currentSalesmanPic = salesman.photo || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+
+// Profile panel values sync
+document.getElementById("salesmanName").innerText = currentSalesmanName;
+document.getElementById("salesmanEmail").innerHTML = `<i class="fa-solid fa-envelope"></i> ${currentSalesmanEmail}`;
+document.getElementById("salesmanPhone").innerHTML = `<i class="fa-solid fa-phone"></i> ${currentSalesmanPhone}`;
+document.getElementById("salesmanPic").src = currentSalesmanPic;
+
+// 3. LOAD SALES METRICS FUNCTION
+async function loadSalesMetrics(){
+    try {
+        if (!db || !currentSalesmanEmail) return;
+
+        // Fetch analytics data specifically filtered by salesman email
+        const { data: sales, error } = await db
+            .from("shop_sale")
+            .select("paid_amount, payment_method")
+            .eq("salesman_email", currentSalesmanEmail);
+
+        if (error) throw error;
+
+        let cashTotal = 0;
+        let onlineTotal = 0;
+
+        if(sales && sales.length > 0){
+            sales.forEach(item => {
+                let amt = Number(item.paid_amount) || 0;
+                
+                if(item.payment_method === "Cash"){
+                    cashTotal += amt;
+                } else if(item.payment_method === "Online" || item.payment_method === "Mpay") {
+                    onlineTotal += amt;
+                }
+            });
+        }
+
+        // DOM binding values animation injection
+        document.getElementById("cashSale").innerText = "₹" + cashTotal;
+        document.getElementById("onlineSale").innerText = "₹" + onlineTotal;
+        document.getElementById("totalSale").innerText = "₹" + (cashTotal + onlineTotal);
+
+    } catch (err) {
+        console.error("Dashboard metric compilation pipeline failed:", err.message);
+    }
+}
+
+// 4. SESSION DESTRUCTION ROUTINE 
+function logout(){
+    if(confirm("Are you sure you want to logout?")){
+        localStorage.removeItem("salesman");
+        window.location.href = "salesmanlogin.html";
+    }
+}
+
+// Page load listener execution hook
+window.onload = function() {
+    loadSalesMetrics();
+};
+</script>
+<script src="back.js"></script>
+
+<script>
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+
+    deferredPrompt = e;
+
+    document.getElementById('installBtn').style.display = 'block';
+});
+
+document.getElementById('installBtn').addEventListener('click', async () => {
+
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+
+    const { outcome } = await deferredPrompt.userChoice;
+
+    if (outcome === 'accepted') {
+        console.log('App Installed');
+    }
+
+    deferredPrompt = null;
+
+    document.getElementById('installBtn').style.display = 'none';
+});
+
+window.addEventListener('appinstalled', () => {
+    document.getElementById('installBtn').style.display = 'none';
+    console.log('PWA Installed Successfully');
+});
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+    .then(() => console.log('Service Worker Registered'));
+}
+</script>
+
+</body>
+</html>

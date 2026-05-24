@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Sale - City Choice Bakers</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="back.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins,sans-serif;
+}
+
+body{
+background:#f6f6f6;
+padding:20px;
+}
+
+/* Header & Profile Section */
+.header{
+background:linear-gradient(135deg,#ff2b2b,#111);
+color:#fff;
+padding:20px;
+border-radius:20px;
+text-align:center;
+margin-bottom:20px;
+position: relative;
+}
+
+.header img.logo{
+width:70px;
+height:70px;
+border-radius:50%;
+background:#fff;
+padding:4px;
+margin-bottom:5px;
+}
+
+.header h2{
+font-size:22px;
+letter-spacing: 0.5px;
+}
+
+.salesman-badge {
+background: rgba(255, 255, 255, 0.15);
+border-radius: 15px;
+padding: 12px;
+margin-top: 15px;
+display: flex;
+align-items: center;
+gap: 12px;
+text-align: left;
+backdrop-filter: blur(5px);
+border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.salesman-badge img.user-pic {
+width: 55px;
+height: 55px;
+border-radius: 50%;
+object-fit: cover;
+background: #fff;
+border: 2px solid #ff2b2b;
+}
+
+.salesman-info h4 {
+font-size: 15px;
+font-weight: 600;
+color: #fff;
+}
+
+.salesman-info p {
+font-size: 11px;
+opacity: 0.9;
+color: #eee;
+margin-top: 1px;
+}
+
+.salesman-info p i {
+margin-right: 4px;
+color: #ff2b2b;
+}
+
+/* Card layout */
+.card{
+background:#fff;
+padding:20px;
+border-radius:20px;
+box-shadow:0 5px 20px rgba(0,0,0,.08);
+margin-bottom:20px;
+}
+
+.card h3{
+margin-bottom:15px;
+font-size: 18px;
+color: #333;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+/* --- Toggle Keypad Button --- */
+.toggle-calc-btn {
+background: #333;
+color: #fff;
+border: none;
+padding: 8px 14px;
+border-radius: 8px;
+font-size: 12px;
+cursor: pointer;
+margin-left: auto;
+display: inline-flex;
+align-items: center;
+gap: 6px;
+transition: 0.2s;
+}
+
+.toggle-calc-btn:hover {
+background: #ff2b2b;
+}
+
+/* --- Real Mobile Calculator Styling --- */
+.mobile-calc-container {
+background: #17171c;
+padding: 15px;
+border-radius: 18px;
+margin-bottom: 5px;
+box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+display: none; /* Hidden by default */
+}
+
+.calc-screen {
+width: 100%;
+background: transparent;
+color: #fff;
+text-align: right;
+border: none;
+font-size: 32px;
+margin-bottom: 15px;
+padding: 10px;
+outline: none;
+pointer-events: none;
+word-wrap: break-word;
+}
+
+.calc-grid {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 10px;
+}
+
+.calc-btn {
+padding: 18px;
+font-size: 20px;
+font-weight: 600;
+border: none;
+border-radius: 50%;
+cursor: pointer;
+transition: background 0.2s;
+display: flex;
+justify-content: center;
+align-items: center;
+aspect-ratio: 1;
+}
+
+.btn-number {
+background: #2c2c34;
+color: #fff;
+}
+
+.btn-number:hover {
+background: #4a4a54;
+}
+
+.btn-operator {
+background: #ff9f0a;
+color: #fff;
+}
+
+.btn-operator:hover {
+background: #cc7f08;
+}
+
+.btn-function {
+background: #a5a5a5;
+color: #000;
+}
+
+.btn-function:hover {
+background: #d4d4d4;
+}
+
+.calc-actions {
+display: flex;
+gap: 10px;
+margin-top: 12px;
+}
+
+.action-btn {
+flex: 1;
+padding: 12px;
+border: none;
+border-radius: 8px;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+color: #fff;
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 5px;
+}
+
+.btn-to-total {
+background: #ff2b2b;
+}
+
+.btn-to-paid {
+background: #0284c7;
+}
+
+label {
+font-size: 13px;
+font-weight: 600;
+color: #555;
+display: block;
+margin-bottom: 6px;
+margin-left: 4px;
+}
+
+input, select {
+width:100%;
+padding:14px;
+border:1px solid #ddd;
+border-radius:12px;
+margin-bottom:15px;
+font-size:15px;
+outline: none;
+transition: 0.2s;
+background-color: #fff;
+}
+
+input:focus, select:focus {
+border-color: #ff2b2b;
+}
+
+/* Triple Payment Method Toggles */
+.payment-box{
+display:flex;
+gap:8px;
+margin-bottom:20px;
+}
+
+.payment-btn{
+flex:1;
+padding:14px;
+border: 2px solid #eee;
+border-radius:12px;
+cursor:pointer;
+font-weight:600;
+background:#eee;
+font-size: 14px;
+transition: 0.2s;
+color: #444;
+}
+
+.payment-btn.active{
+background:#16a34a;
+color:#fff;
+border-color: #16a34a;
+}
+
+/* Form Live Metrics View */
+.result{
+background:#fff5f5;
+padding:15px;
+border-radius:15px;
+margin-top:10px;
+border-left: 4px solid #ff2b2b;
+}
+
+.result p{
+margin:6px 0;
+font-size:15px;
+display: flex;
+justify-content: space-between;
+}
+
+.result p b {
+color: #444;
+}
+
+.save-btn{
+width:100%;
+padding:15px;
+border:none;
+border-radius:14px;
+background:#ff2b2b;
+color:#fff;
+font-size:17px;
+font-weight:700;
+cursor:pointer;
+box-shadow: 0 4px 10px rgba(255, 43, 43, 0.3);
+margin-bottom: 25px;
+}
+
+.save-btn:hover{
+opacity:.9;
+}
+
+/* History Box Styles */
+.history-container {
+max-height: 350px;
+overflow-y: auto;
+margin-top: 10px;
+border-radius: 12px;
+border: 1px solid #eee;
+}
+
+.history-table {
+width: 100%;
+border-collapse: collapse;
+background: #fff;
+font-size: 13px;
+text-align: left;
+}
+
+.history-table th {
+background: #333;
+color: #fff;
+padding: 12px 10px;
+font-weight: 500;
+position: sticky;
+top: 0;
+}
+
+.history-table td {
+padding: 12px 10px;
+border-bottom: 1px solid #eee;
+vertical-align: middle;
+}
+
+.history-table tr:nth-child(even) {
+background: #f9f9f9;
+}
+
+.badge-pay {
+padding: 3px 8px;
+border-radius: 6px;
+font-size: 11px;
+font-weight: 600;
+text-transform: uppercase;
+}
+.bg-cash { background: #dcfce7; color: #16a34a; }
+.bg-online { background: #e0f2fe; color: #0369a1; }
+.bg-mpay { background: #f3e8ff; color: #7e22ce; }
+
+.text-danger { color: #dc2626; font-weight: 600; }
+.text-success { color: #16a34a; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <img src="logo.png" class="logo" alt="City Choice Logo">
+    <h2>CITY CHOICE BAKERS</h2>
+    <p>Sales Entry Platform</p>
+    
+    <div class="salesman-badge">
+        <img id="salesmanPic" class="user-pic" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Salesman Pic">
+        <div class="salesman-info">
+            <h4 id="salesmanName">Loading...</h4>
+            <p id="salesmanEmail"><i class="fa-solid fa-envelope"></i> Loading...</p>
+            <p id="salesmanPhone"><i class="fa-solid fa-phone"></i> Loading...</p>
+            <p id="salesmanShop"><i class="fa-solid fa-shop"></i> Loading...</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display: flex; align-items: center; width: 100%; margin-bottom: 10px;">
+        <h3 style="margin-bottom: 0;"><i class="fa-solid fa-calculator" style="color: #ff2b2b;"></i> Digital Keypad</h3>
+        <button class="toggle-calc-btn" onclick="toggleCalculator()" id="toggleCalcBtn">
+            <i class="fa-solid fa-eye"></i> Show Keypad
+        </button>
+    </div>
+    
+    <div id="calculatorContainer" class="mobile-calc-container">
+        <input type="text" id="calcDisplay" class="calc-screen" value="0" readonly>
+        
+        <div class="calc-grid">
+            <button class="calc-btn btn-function" onclick="window.clearCalc()">C</button>
+            <button class="calc-btn btn-function" onclick="window.backspaceCalc()"><i class="fa-solid fa-backspace"></i></button>
+            <button class="calc-btn btn-function" onclick="window.appendCalc('(')">(</button>
+            <button class="calc-btn btn-operator" onclick="window.appendCalc('/')">÷</button>
+            
+            <button class="calc-btn btn-number" onclick="window.appendCalc('7')">7</button>
+            <button class="calc-btn btn-number" onclick="window.appendCalc('8')">8</button>
+            <button class="calc-btn btn-number" onclick="window.appendCalc('9')">9</button>
+            <button class="calc-btn btn-operator" onclick="window.appendCalc('*')">×</button>
+            
+            <button class="calc-btn btn-number" onclick="window.appendCalc('4')">4</button>
+            <button class="calc-btn btn-number" onclick="window.appendCalc('5')">5</button>
+            <button class="calc-btn btn-number" onclick="window.appendCalc('6')">6</button>
+            <button class="calc-btn btn-operator" onclick="window.appendCalc('-')">-</button>
+            
+            <button class="calc-btn btn-number" onclick="window.appendCalc('1')">1</button>
+            <button class="calc-btn btn-number" onclick="window.appendCalc('2')">2</button>
+            <button class="calc-btn btn-number" onclick="window.appendCalc('3')">3</button>
+            <button class="calc-btn btn-operator" onclick="window.appendCalc('+')">+</button>
+            
+            <button class="calc-btn btn-number" style="grid-column: span 2; border-radius: 30px; aspect-ratio: auto;" onclick="window.appendCalc('0')">0</button>
+            <button class="calc-btn btn-number" onclick="window.appendCalc('.')">.</button>
+            <button class="calc-btn btn-operator" onclick="window.calculateResult()">=</button>
+        </div>
+        
+        <div class="calc-actions">
+            <button class="action-btn btn-to-total" onclick="window.sendToField('totalAmount')"><i class="fa-solid fa-arrow-down"></i> Use as Total</button>
+            <button class="action-btn btn-to-paid" onclick="window.sendToField('paidAmount')"><i class="fa-solid fa-arrow-down"></i> Use as Paid</button>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3><i class="fa-solid fa-cart-plus" style="color: #ff2b2b;"></i> New Sale Entry</h3>
+    
+    <label>Shop Name</label>
+    <select id="shopName">
+        <option value="">Loading Shops...</option>
+    </select>
+
+    <label>Customer Name</label>
+    <input type="text" id="customerName" placeholder="Enter customer name">
+
+    <label>Total Amount (₹)</label>
+    <input type="number" id="totalAmount" placeholder="0.00">
+
+    <label>Paid Amount (₹)</label>
+    <input type="number" id="paidAmount" placeholder="0.00">
+
+    <label>Payment Method</label>
+    <div class="payment-box">
+        <button class="payment-btn" id="cashBtn" onclick="selectMethod('Cash')"><i class="fa-solid fa-money-bill-wave"></i> Cash</button>
+        <button class="payment-btn" id="onlineBtn" onclick="selectMethod('Online')"><i class="fa-solid fa-globe"></i> Online</button>
+        <button class="payment-btn" id="mpayBtn" onclick="selectMethod('Mpay')"><i class="fa-solid fa-mobile-screen-button"></i> Mpay</button>
+    </div>
+
+    <label>Special Notes</label>
+    <input type="text" id="notes" placeholder="Any order specification or comments (Optional)">
+
+    <div class="result">
+        <p><b>Total Amount:</b> <span>₹ <span id="showTotal">0</span></span></p>
+        <p><b>Paid Amount:</b> <span>₹ <span id="showPaid">0</span></span></p>
+        <p><b>Remaining Balance:</b> <span class="text-danger">₹ <span id="showFinal">0</span></span></p>
+        <p><b>Selected Mode:</b> <span id="showMethod" style="font-weight:600; color:#333;">Not Selected</span></p>
+    </div>
+</div>
+
+<button class="save-btn" onclick="saveData()">
+    <i class="fa-solid fa-floppy-disk"></i> Save Record & Sync
+</button>
+
+<div class="card">
+    <h3><i class="fa-solid fa-clock-rotate-left" style="color: #ff2b2b;"></i> Today's Sales Logs</h3>
+    <div class="history-container">
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>Shop / Client</th>
+                    <th>Total</th>
+                    <th>Paid</th>
+                    <th>Balance</th>
+                    <th>Mode</th>
+                </tr>
+            </thead>
+            <tbody id="historyBody">
+                <tr>
+                    <td colspan="5" style="text-align:center; padding:20px; color:#999;">Fetching records...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+// --- DIRECT INLINE SUPABASE CREDENTIALS SETUP ---
+const SUPABASE_URL = "https://ftuchilcswtnnldrugir.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0dWNoaWxjc3d0bm5sZHJ1Z2lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNjAyNDQsImV4cCI6MjA5NDczNjI0NH0.88SWE5lvsJD0Fw8x7h4pgAmq1WFRN1qMvmXHCXeDqsU";           
+
+// Global state variables
+let paymentMethod = "";
+let currentExpression = "";
+let db;
+
+// 1. INLINE DATABASE INITIALIZATION
+try {
+    if (typeof supabase !== 'undefined') {
+        db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else {
+        console.error("Supabase CDN script package is not loaded properly.");
+    }
+} catch(err) {
+    console.error("Supabase direct authentication failed:", err.message);
+}
+
+// Toggle Calculator Visibility
+function toggleCalculator() {
+    let calcContainer = document.getElementById("calculatorContainer");
+    let toggleBtn = document.getElementById("toggleCalcBtn");
+    
+    if (calcContainer.style.display === "none" || calcContainer.style.display === "") {
+        calcContainer.style.display = "block";
+        toggleBtn.innerHTML = `<i class="fa-solid fa-eye-slash"></i> Hide Keypad`;
+    } else {
+        calcContainer.style.display = "none";
+        toggleBtn.innerHTML = `<i class="fa-solid fa-eye"></i> Show Keypad`;
+    }
+}
+
+// 2. CALCULATOR MODULE ACTIONS
+window.appendCalc = function(val) {
+    if (currentExpression === "" && (val === '/' || val === '*' || val === '+' || val === ')')) return; 
+    currentExpression += val;
+    document.getElementById("calcDisplay").value = currentExpression;
+};
+
+window.clearCalc = function() {
+    currentExpression = "";
+    document.getElementById("calcDisplay").value = "0";
+};
+
+window.backspaceCalc = function() {
+    if (currentExpression.length > 0) {
+        currentExpression = currentExpression.slice(0, -1);
+        document.getElementById("calcDisplay").value = currentExpression === "" ? "0" : currentExpression;
+    }
+};
+
+window.calculateResult = function() {
+    try {
+        if(currentExpression === "") return;
+        let sanitizedExpression = currentExpression.replace(/[^0-9+\-*/().]/g, '');
+        let res = Function('"use strict";return (' + sanitizedExpression + ')')();
+        
+        if (res === undefined || isNaN(res) || !isFinite(res)) {
+            document.getElementById("calcDisplay").value = "Error";
+            currentExpression = "";
+        } else {
+            res = Math.round(res * 100) / 100;
+            document.getElementById("calcDisplay").value = res;
+            currentExpression = res.toString();
+        }
+    } catch (err) {
+        document.getElementById("calcDisplay").value = "Error";
+        currentExpression = "";
+    }
+};
+
+window.sendToField = function(fieldId) {
+    let val = parseFloat(document.getElementById("calcDisplay").value);
+    if (!isNaN(val) && document.getElementById("calcDisplay").value !== "Error") {
+        document.getElementById(fieldId).value = val;
+        updateValues();
+    }
+};
+
+// 3. SALESMAN USER SESSION STATE
+let salesman;
+let currentSalesmanName = "Salesman Profile";
+let currentSalesmanEmail = "";
+let currentSalesmanPhone = "";
+let currentSalesmanPic = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+let currentSalesmanShop = "";
+
+try {
+    salesman = JSON.parse(localStorage.getItem("salesman"));
+    
+    if(!salesman){
+        window.location.href = "salesmanlogin.html";
+    } else {
+        currentSalesmanName = salesman.username || salesman.name || "Salesman Profile";
+        currentSalesmanEmail = salesman.email || "";
+        currentSalesmanPhone = salesman.phone || "No Phone Registered";
+        currentSalesmanPic = salesman.photo || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+        currentSalesmanShop = salesman.shop_name || "No Assigned Shop";
+
+        document.getElementById("salesmanName").innerText = currentSalesmanName;
+        document.getElementById("salesmanEmail").innerHTML = `<i class="fa-solid fa-envelope"></i> ${currentSalesmanEmail}`;
+        document.getElementById("salesmanPhone").innerHTML = `<i class="fa-solid fa-phone"></i> ${currentSalesmanPhone}`;
+        document.getElementById("salesmanShop").innerHTML = `<i class="fa-solid fa-shop"></i> ${currentSalesmanShop}`;
+        document.getElementById("salesmanPic").src = currentSalesmanPic;
+    }
+} catch(e) {
+    console.error("Local Storage session verification crashed:", e.message);
+}
+
+// 4. NETWORK & DATABASE TRANSACTIONS
+async function loadShops() {
+    try {
+        if (!db) {
+            renderShopFallback();
+            return;
+        }
+
+        const { data, error } = await db
+            .from("shops") 
+            .select("shop_name")
+            .order("shop_name", { ascending: true });
+
+        if (error) throw error;
+
+        let selectDropdown = document.getElementById("shopName");
+        let html = '<option value="">-- Select Shop --</option>';
+
+        if (data && data.length > 0) {
+            data.forEach(shop => {
+                let isSelected = (shop.shop_name === currentSalesmanShop) ? "selected" : "";
+                html += `<option value="${shop.shop_name}" ${isSelected}>${shop.shop_name}</option>`;
+            });
+        } else if(currentSalesmanShop) {
+            html += `<option value="${currentSalesmanShop}" selected>${currentSalesmanShop}</option>`;
+        }
+        selectDropdown.innerHTML = html;
+    } catch (err) {
+        console.error("Database fetch failed for shops:", err.message);
+        renderShopFallback();
+    }
+}
+
+function renderShopFallback() {
+    let selectDropdown = document.getElementById("shopName");
+    if(currentSalesmanShop) {
+        selectDropdown.innerHTML = `<option value="${currentSalesmanShop}" selected>${currentSalesmanShop}</option>`;
+    } else {
+        selectDropdown.innerHTML = '<option value="">-- Choose Shop --</option>';
+    }
+}
+
+function selectMethod(method){
+    paymentMethod = method;
+    document.getElementById("cashBtn").classList.remove("active");
+    document.getElementById("onlineBtn").classList.remove("active");
+    document.getElementById("mpayBtn").classList.remove("active");
+
+    if(method === "Cash") document.getElementById("cashBtn").classList.add("active");
+    if(method === "Online") document.getElementById("onlineBtn").classList.add("active");
+    if(method === "Mpay") document.getElementById("mpayBtn").classList.add("active");
+    
+    document.getElementById("showMethod").innerText = method;
+}
+
+function updateValues(){
+    let total = Number(document.getElementById("totalAmount").value) || 0;
+    let paid = Number(document.getElementById("paidAmount").value) || 0;
+    document.getElementById("showTotal").innerText = total;
+    document.getElementById("showPaid").innerText = paid;
+    document.getElementById("showFinal").innerText = total - paid;
+}
+
+document.getElementById("totalAmount").addEventListener("input", updateValues);
+document.getElementById("paidAmount").addEventListener("input", updateValues);
+
+async function fetchHistory(){
+    try {
+        if (!db || !currentSalesmanEmail) return;
+        const { data, error } = await db
+            .from("shop_sale")
+            .select("*")
+            .eq("salesman_email", currentSalesmanEmail)
+            .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        let html = "";
+        if(!data || data.length === 0){
+            html = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#999;">No entries logged yet today.</td></tr>`;
+        } else {
+            data.forEach(row => {
+                let badgeClass = row.payment_method === "Online" ? "bg-online" : (row.payment_method === "Mpay" ? "bg-mpay" : "bg-cash");
+                let balanceStyle = row.remaining_amount > 0 ? "text-danger" : "text-success";
+                html += `
+                    <tr>
+                        <td><b>${row.shop_name || 'N/A'}</b><br><span style="font-size:11px; color:#777;">${row.customer_name || 'No Name'}</span></td>
+                        <td>₹${row.total_amount}</td>
+                        <td>₹${row.paid_amount}</td>
+                        <td class="${balanceStyle}">₹${row.remaining_amount}</td>
+                        <td><span class="badge-pay ${badgeClass}">${row.payment_method}</span></td>
+                    </tr>`;
+            });
+        }
+        document.getElementById("historyBody").innerHTML = html;
+    } catch (err) {
+        console.error("History logging pipeline failed:", err.message);
+        document.getElementById("historyBody").innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999; padding:15px;">Logs will refresh automatically.</td></tr>`;
+    }
+}
+
+async function saveData(){
+    let shopName = document.getElementById("shopName").value;
+    let customerName = document.getElementById("customerName").value.trim();
+    let total = Number(document.getElementById("totalAmount").value) || 0;
+    let paid = Number(document.getElementById("paidAmount").value) || 0;
+    let remaining = total - paid;
+    let notes = document.getElementById("notes").value.trim();
+
+    if(!shopName) return alert("Please Select a Shop Name");
+    if(!paymentMethod) return alert("Please Select a Payment Method");
+    if(!db) return alert("Database server sync object is missing!");
+
+    const { error } = await db
+        .from("shop_sale")
+        .insert([{
+            shop_name: shopName,
+            salesman_name: currentSalesmanName,
+            salesman_email: currentSalesmanEmail,
+            salesman_phone: currentSalesmanPhone,
+            customer_name: customerName,
+            total_amount: total,
+            paid_amount: paid,
+            remaining_amount: remaining,
+            payment_method: paymentMethod,
+            notes: notes
+        }]);
+
+    if(error) return alert("Database Sync Failed: " + error.message);
+
+    alert("Record Saved to Database successfully!");
+
+    // Clean UI flush
+    document.getElementById("customerName").value = "";
+    document.getElementById("totalAmount").value = "";
+    document.getElementById("paidAmount").value = "";
+    document.getElementById("notes").value = "";
+    document.getElementById("showTotal").innerText = "0";
+    document.getElementById("showPaid").innerText = "0";
+    document.getElementById("showFinal").innerText = "0";
+    document.getElementById("showMethod").innerText = "Not Selected";
+
+    paymentMethod = "";
+    document.getElementById("cashBtn").classList.remove("active");
+    document.getElementById("onlineBtn").classList.remove("active");
+    document.getElementById("mpayBtn").classList.remove("active");
+
+    window.clearCalc();
+    fetchHistory();
+}
+
+window.onload = function() {
+    loadShops();
+    fetchHistory();
+};
+</script>
+<script src="back.js"></script>
+</body>
+</html>
